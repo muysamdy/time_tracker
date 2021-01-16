@@ -13,6 +13,7 @@ dependencies:
 
   cupertino_icons: ^1.0.0
   logger: ^0.9.4
+  gap: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -21,4 +22,8 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
+
+  assets:
+    - images/facebook-logo.png
+    - images/google-logo.png
 
