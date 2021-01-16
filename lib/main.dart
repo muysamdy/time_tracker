@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:time_tracker/screen/signin_screen.dart';
+import 'package:time_tracker/screen/signin.dart';
 
 class MyApp extends StatelessWidget {
   @override
