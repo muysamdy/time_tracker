@@ -1,12 +1,19 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
+  final VoidCallback onSignOut;
 
-  // Future<void> _signOut(BuildContext context) async {
-  //   try {
-  //     final auth =
-  //   }
-  // }
+  const HomeScreen({Key key, @required this.onSignOut}) : super(key: key);
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      onSignOut();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +29,7 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            onPressed: null,
-            // onPressed: () => _confirmSignOut(context),
+            onPressed: () => _signOut(context),
           )
         ],
       ),

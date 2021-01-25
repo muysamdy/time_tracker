@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:time_tracker/windget.dart';
@@ -7,10 +6,24 @@ import 'package:time_tracker/windget.dart';
 import 'package:time_tracker/logger.dart';
 
 class SignInScreen extends StatelessWidget {
-  void _signInAnonymously() async {
-    final authResult = await FirebaseAuth.instance.signInAnonymously();
-    logger.d('${authResult.user.uid}');
+  const SignInScreen({Key key, @required this.onSignIn}) : super(key: key);
+
+  final Function(User) onSignIn;
+
+  Future<void> _signInAnonymously() async {
+    try {
+      final authResult = await FirebaseAuth.instance.signInAnonymously();
+      onSignIn(authResult.user);
+    } catch (e) {
+      print(e.toString());
+    }
   }
+
+  Future<void> _signInWithEmail() async {}
+
+  Future<void> _signInWithFacebook() async {}
+
+  Future<void> _signInWithGoogle() async {}
 
   Widget _buildContent(BuildContext context) {
     return Padding(
