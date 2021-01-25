@@ -1,19 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:time_tracker/auth.dart';
 import 'package:time_tracker/windget.dart';
 
 import 'package:time_tracker/logger.dart';
 
 class SignInScreen extends StatelessWidget {
-  const SignInScreen({Key key, @required this.onSignIn}) : super(key: key);
+  const SignInScreen({
+    Key key,
+    @required this.auth,
+  }) : super(key: key);
 
-  final Function(User) onSignIn;
+  final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
     try {
-      final authResult = await FirebaseAuth.instance.signInAnonymously();
-      onSignIn(authResult.user);
+      await auth.signInAnonymously();
     } catch (e) {
       print(e.toString());
     }
@@ -23,7 +26,13 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> _signInWithFacebook() async {}
 
-  Future<void> _signInWithGoogle() async {}
+  Future<void> _signInWithGoogle() async {
+    try {
+      await auth.signInWithGoogle();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Widget _buildContent(BuildContext context) {
     return Padding(
@@ -40,7 +49,7 @@ class SignInScreen extends StatelessWidget {
           SocialSignInButton(
             assetName: 'images/google-logo.png',
             text: 'Sign in with Google',
-            onPressed: () {},
+            onPressed: _signInWithGoogle,
           ),
           Gap(8),
           SocialSignInButton(

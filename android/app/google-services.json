@@ -15,14 +15,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "60261181256-6m958laa938pra5b7v4703cg26mfes9e.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.time_tracker",
-            "certificate_hash": "ebf8a6e27a107efd6713b279658f03073b82951c"
-          }
-        },
-        {
           "client_id": "60261181256-o7h777gm7sbf4du71r4q71v06p32f1gv.apps.googleusercontent.com",
           "client_type": 3
         }
