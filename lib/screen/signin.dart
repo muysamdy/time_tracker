@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:time_tracker/auth.dart';
+import 'package:time_tracker/screen/email_signin.dart';
 import 'package:time_tracker/windget.dart';
 
 import 'package:time_tracker/logger.dart';
@@ -22,9 +23,20 @@ class SignInScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _signInWithEmail() async {}
+  void _signInWithEmail(BuildContext context) async {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      fullscreenDialog: true,
+      builder: (context) => EmailSignInScreen(auth: auth),
+    ));
+  }
 
-  Future<void> _signInWithFacebook() async {}
+  Future<void> _signInWithFacebook() async {
+    try {
+      await auth.signInWithFacebook();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   Future<void> _signInWithGoogle() async {
     try {
@@ -57,14 +69,14 @@ class SignInScreen extends StatelessWidget {
             text: 'Sign in with Facebook',
             textColor: Colors.white,
             color: Color(0xFF334D92),
-            onPressed: () {},
+            onPressed: _signInWithFacebook,
           ),
           Gap(8),
           SignInButton(
             text: 'Sign In with email',
             textColor: Colors.white,
             color: Colors.teal[700],
-            onPressed: () {},
+            onPressed: () => _signInWithEmail(context),
           ),
           Gap(8),
           Text(
