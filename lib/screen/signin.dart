@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:time_tracker/auth.dart';
@@ -8,16 +7,29 @@ import 'package:time_tracker/windget.dart';
 import 'package:time_tracker/logger.dart';
 
 class SignInScreen extends StatelessWidget {
-  const SignInScreen({
-    Key key,
-    @required this.auth,
-  }) : super(key: key);
+  SignInScreen({@required this.auth});
 
   final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
     try {
       await auth.signInAnonymously();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      await auth.signInWithGoogle();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _signInWithFacebook() async {
+    try {
+      await auth.signInWithFacebook();
     } catch (e) {
       print(e.toString());
     }
@@ -30,20 +42,15 @@ class SignInScreen extends StatelessWidget {
     ));
   }
 
-  Future<void> _signInWithFacebook() async {
-    try {
-      await auth.signInWithFacebook();
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      await auth.signInWithGoogle();
-    } catch (e) {
-      print(e.toString());
-    }
+  Widget _buildHeader() {
+    return Text(
+      'Sign in',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 32.0,
+        fontWeight: FontWeight.w600,
+      ),
+    );
   }
 
   Widget _buildContent(BuildContext context) {
@@ -61,6 +68,7 @@ class SignInScreen extends StatelessWidget {
           SocialSignInButton(
             assetName: 'images/google-logo.png',
             text: 'Sign in with Google',
+            color: Colors.white,
             onPressed: _signInWithGoogle,
           ),
           Gap(8),
@@ -92,17 +100,6 @@ class SignInScreen extends StatelessWidget {
             onPressed: _signInAnonymously,
           )
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Text(
-      'Sign in',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 32.0,
-        fontWeight: FontWeight.w600,
       ),
     );
   }

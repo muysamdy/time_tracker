@@ -4,16 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-abstract class PlatformWidget extends StatelessWidget {
-  Widget buildCupertinoWidget(BuildContext context);
-
-  Widget buildMaterialWidget(BuildContext context);
-
-  @override
-  Widget build(BuildContext context) => (Platform.isIOS)
-      ? buildCupertinoWidget(context)
-      : buildMaterialWidget(context);
-}
+// abstract class PlatformWidget extends StatelessWidget {
+//   Widget buildCupertinoWidget(BuildContext context);
+//
+//   Widget buildMaterialWidget(BuildContext context);
+//
+//   @override
+//   Widget build(BuildContext context) => (Platform.isIOS)
+//       ? buildCupertinoWidget(context)
+//       : buildMaterialWidget(context);
+// }
 
 class CustomRaiseButton extends StatelessWidget {
   CustomRaiseButton({
@@ -100,7 +100,10 @@ class FormSubmitButton extends CustomRaiseButton {
   }) : super(
           child: Text(
             text,
-            style: TextStyle(color: Colors.white, fontSize: 20.0),
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+            ),
           ),
           height: 44.0,
           color: Colors.indigo,
@@ -109,96 +112,96 @@ class FormSubmitButton extends CustomRaiseButton {
         );
 }
 
-class PlatformAlertDialogAction extends PlatformWidget {
-  PlatformAlertDialogAction({this.child, this.onPressed});
-
-  final Widget child;
-  final VoidCallback onPressed;
-
-  @override
-  Widget buildCupertinoWidget(BuildContext context) =>
-      CupertinoDialogAction(child: child, onPressed: onPressed);
-
-  Widget buildMaterialWidget(BuildContext context) =>
-      FlatButton(child: child, onPressed: onPressed);
-}
-
-class PlatformAlertDialog extends PlatformWidget {
-  PlatformAlertDialog({
-    @required this.title,
-    @required this.content,
-    @required this.defaultActionText,
-    this.cancelActionText,
-  })  : assert(title != null),
-        assert(content != null),
-        assert(defaultActionText != null);
-
-  final String title;
-  final String content;
-  final String cancelActionText;
-  final String defaultActionText;
-
-  Future<bool> show(BuildContext context) async => (Platform.isIOS)
-      ? await showCupertinoDialog<bool>(
-          context: context,
-          builder: (context) => this,
-        )
-      : await showDialog<bool>(
-          context: context,
-          barrierDismissible: true,
-          builder: (context) => this,
-        );
-
-  List<Widget> _buildActions(BuildContext context) {
-    final actions = <Widget>[];
-
-    if (cancelActionText != null) {
-      actions
-        ..add(
-          PlatformAlertDialogAction(
-            child: Text(cancelActionText),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-        );
-    }
-    actions
-      ..add(
-        PlatformAlertDialogAction(
-          child: Text(defaultActionText),
-          onPressed: () => Navigator.of(context).pop(true),
-        ),
-      );
-  }
-
-  @override
-  Widget buildCupertinoWidget(BuildContext context) => CupertinoAlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: _buildActions(context),
-      );
-
-  @override
-  Widget buildMaterialWidget(BuildContext context) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: _buildActions(context),
-      );
-}
-
-class PlatformExceptionAlertDialog extends PlatformAlertDialog {
-  PlatformExceptionAlertDialog({
-    @required String title,
-    @required PlatformException exception,
-  }) : super(
-          title: title,
-          content: _message(exception),
-          defaultActionText: 'OK',
-        );
-
-  static const Map<String, String> _errors = {
-    'ERROR_WRONG_PASSWORD': 'The pasword is invalid',
-  };
-
-  static String _message(PlatformException exception) =>
-      _errors[exception.code] ?? exception.message;
-}
+// class PlatformAlertDialogAction extends PlatformWidget {
+//   PlatformAlertDialogAction({this.child, this.onPressed});
+//
+//   final Widget child;
+//   final VoidCallback onPressed;
+//
+//   @override
+//   Widget buildCupertinoWidget(BuildContext context) =>
+//       CupertinoDialogAction(child: child, onPressed: onPressed);
+//
+//   Widget buildMaterialWidget(BuildContext context) =>
+//       FlatButton(child: child, onPressed: onPressed);
+// }
+//
+// class PlatformAlertDialog extends PlatformWidget {
+//   PlatformAlertDialog({
+//     @required this.title,
+//     @required this.content,
+//     @required this.defaultActionText,
+//     this.cancelActionText,
+//   })  : assert(title != null),
+//         assert(content != null),
+//         assert(defaultActionText != null);
+//
+//   final String title;
+//   final String content;
+//   final String cancelActionText;
+//   final String defaultActionText;
+//
+//   Future<bool> show(BuildContext context) async => (Platform.isIOS)
+//       ? await showCupertinoDialog<bool>(
+//           context: context,
+//           builder: (context) => this,
+//         )
+//       : await showDialog<bool>(
+//           context: context,
+//           barrierDismissible: true,
+//           builder: (context) => this,
+//         );
+//
+//   List<Widget> _buildActions(BuildContext context) {
+//     final actions = <Widget>[];
+//
+//     if (cancelActionText != null) {
+//       actions
+//         ..add(
+//           PlatformAlertDialogAction(
+//             child: Text(cancelActionText),
+//             onPressed: () => Navigator.of(context).pop(false),
+//           ),
+//         );
+//     }
+//     actions
+//       ..add(
+//         PlatformAlertDialogAction(
+//           child: Text(defaultActionText),
+//           onPressed: () => Navigator.of(context).pop(true),
+//         ),
+//       );
+//   }
+//
+//   @override
+//   Widget buildCupertinoWidget(BuildContext context) => CupertinoAlertDialog(
+//         title: Text(title),
+//         content: Text(content),
+//         actions: _buildActions(context),
+//       );
+//
+//   @override
+//   Widget buildMaterialWidget(BuildContext context) => AlertDialog(
+//         title: Text(title),
+//         content: Text(content),
+//         actions: _buildActions(context),
+//       );
+// }
+//
+// class PlatformExceptionAlertDialog extends PlatformAlertDialog {
+//   PlatformExceptionAlertDialog({
+//     @required String title,
+//     @required PlatformException exception,
+//   }) : super(
+//           title: title,
+//           content: _message(exception),
+//           defaultActionText: 'OK',
+//         );
+//
+//   static const Map<String, String> _errors = {
+//     'ERROR_WRONG_PASSWORD': 'The pasword is invalid',
+//   };
+//
+//   static String _message(PlatformException exception) =>
+//       _errors[exception.code] ?? exception.message;
+// }

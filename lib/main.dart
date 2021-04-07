@@ -12,16 +12,15 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
       ),
       home: LandingScreen(auth: Auth()),
+
     );
   }
 }
 
-void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
+
 }
 
-
-
-? Hello world ?

@@ -1,64 +1,65 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthBase {
-  Stream<User> get onAuthStateChange;
+  Stream<BaseUser> get onAuthStateChange;
 
-  Future<User> currentUser();
+  Future<BaseUser> currentUser();
 
-  Future<User> signInAnonymously();
+  Future<BaseUser> signInAnonymously();
 
-  Future<User> signInWithGoogle();
+  Future<BaseUser> signInWithGoogle();
 
-  Future<User> signInWithFacebook();
+  Future<BaseUser> signInWithFacebook();
 
-  Future<User> signInWithEmail(String email, String password);
+  Future<BaseUser> signInWithEmail(String email, String password);
 
-  Future<User> createUserWithEmail(String email, String password);
+  Future<BaseUser> createUserWithEmail(String email, String password);
 
   Future<void> signOut();
+}
+
+class BaseUser {
+  BaseUser({@required this.uid});
+
+  final String uid;
 }
 
 class Auth implements AuthBase {
   final _firebaseAuth = FirebaseAuth.instance;
 
-  @override
-  Stream<User> get onAuthStateChange => _firebaseAuth.authStateChanges();
-
-  @override
-  Future<User> currentUser() async {
-    return await _firebaseAuth.currentUser;
+  BaseUser _userFromFirebase(User user) {
+    if (user == null) {
+      return null;
+    }
+    return BaseUser(uid: user.uid);
   }
 
   @override
-  Future<User> signInWithEmail(String email, String password) async {
-    final authResult = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
-    return authResult.user;
+  Stream<BaseUser> get onAuthStateChange =>
+      _firebaseAuth.authStateChanges().map(_userFromFirebase);
+
+  @override
+  Future<BaseUser> currentUser() async {
+    final user = _firebaseAuth.currentUser;
+    return _userFromFirebase(user);
   }
 
   @override
-  Future<User> createUserWithEmail(String email, String password) async {
-    final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    return authResult.user;
-  }
-
-  @override
-  Future<User> signInAnonymously() async {
-    final authResult = await _firebaseAuth.signInAnonymously();
-    return authResult.user;
-  }
-
-  @override
-  Future<User> signInWithGoogle() async {
+  Future<BaseUser> signInWithGoogle() async {
+    // TODO: implement signInWithGoogle
+    // GoogleSignIn googleSignIn = GoogleSignIn();
     final googleSignIn = GoogleSignIn();
+    // GoogleSignInAccount googleAccount = await googleSignIn.signIn();
     final googleAccount = await googleSignIn.signIn();
-
+    // check the account not null
     if (googleAccount != null) {
-      final googleAuth = await googleAccount.authentication;
+      // find the way to access token.
+      GoogleSignInAuthentication googleAuth =
+          await googleAccount.authentication;
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final authResult = await _firebaseAuth.signInWithCredential(
           GoogleAuthProvider.credential(
@@ -66,9 +67,7 @@ class Auth implements AuthBase {
             accessToken: googleAuth.accessToken,
           ),
         );
-        return authResult.user;
-
-        // return user;
+        return _userFromFirebase(authResult.user);
       } else {
         throw PlatformException(
           code: 'ERROR_MISSING_GOOGLE_AUTH_TOKEN',
@@ -84,31 +83,125 @@ class Auth implements AuthBase {
   }
 
   @override
-  Future<User> signInWithFacebook() async {
+  Future<BaseUser> signInWithFacebook() async {
     final facebookLogin = FacebookLogin();
     final result = await facebookLogin.logInWithReadPermissions(
       ['public_profile'],
     );
-
     if (result.accessToken != null) {
       final authResult = await _firebaseAuth.signInWithCredential(
-        FacebookAuthProvider.credential(result.accessToken.token),
+        FacebookAuthProvider.credential(
+          result.accessToken.token,
+        ),
       );
-      return authResult.user;
+      return _userFromFirebase(authResult.user);
     } else {
       throw PlatformException(
         code: 'ERROR_ABORTED_BY_USER',
-        message: 'Sign in aborted by user',
+        message: 'sign in aborted by user',
       );
     }
+  }
+
+  Future<BaseUser> signInAnonymously() async {
+    final authResult = await _firebaseAuth.signInAnonymously();
+    return _userFromFirebase(authResult.user);
+  }
+
+  @override
+  Future<BaseUser> signInWithEmail(String email, String password) async {
+    final authResult = await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _userFromFirebase(authResult.user);
+  }
+
+  @override
+  Future<BaseUser> createUserWithEmail(String email, String password) async {
+    final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return _userFromFirebase(authResult.user);
   }
 
   @override
   Future<void> signOut() async {
     final googleSignIn = GoogleSignIn();
     final facebookLogin = FacebookLogin();
+    await _firebaseAuth.signOut();
     await facebookLogin.logOut();
     await googleSignIn.signOut();
-    await _firebaseAuth.signOut();
   }
 }
+
+// class Auth implements AuthBase {
+//
+
+//   @override
+//   Future<User> signInWithEmail(String email, String password) async {
+//     final authResult = await _firebaseAuth.signInWithEmailAndPassword(
+//         email: email, password: password);
+//     return authResult.user;
+//   }
+//
+//   @override
+//   Future<User> createUserWithEmail(String email, String password) async {
+//     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
+//         email: email, password: password);
+//     return authResult.user;
+//   }
+//
+//   @override
+//   Future<User> signInWithGoogle() async {
+//     final googleSignIn = GoogleSignIn();
+//     final googleAccount = await googleSignIn.signIn();
+//
+//     if (googleAccount != null) {
+//       final googleAuth = await googleAccount.authentication;
+//       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
+//         final authResult = await _firebaseAuth.signInWithCredential(
+//           GoogleAuthProvider.credential(
+//             idToken: googleAuth.idToken,
+//             accessToken: googleAuth.accessToken,
+//           ),
+//         );
+//         return authResult.user;
+//
+//         // return user;
+//       } else {
+//         throw PlatformException(
+//           code: 'ERROR_MISSING_GOOGLE_AUTH_TOKEN',
+//           message: 'Missing Google Auth Token',
+//         );
+//       }
+//     } else {
+//       throw PlatformException(
+//         code: 'ERROR_ABORTED_BY_USER',
+//         message: 'Sign in aborted by user',
+//       );
+//     }
+//   }
+//
+//   @override
+//   Future<User> signInWithFacebook() async {
+//     final facebookLogin = FacebookLogin();
+//     final result = await facebookLogin.logInWithReadPermissions(
+//       ['public_profile'],
+//     );
+//
+//     if (result.accessToken != null) {
+//       final authResult = await _firebaseAuth.signInWithCredential(
+//         FacebookAuthProvider.credential(result.accessToken.token),
+//       );
+//       return authResult.user;
+//     } else {
+//       throw PlatformException(
+//         code: 'ERROR_ABORTED_BY_USER',
+//         message: 'Sign in aborted by user',
+//       );
+//     }
+//   }
+//
+// }
