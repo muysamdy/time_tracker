@@ -4,17 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// abstract class PlatformWidget extends StatelessWidget {
-//   Widget buildCupertinoWidget(BuildContext context);
-//
-//   Widget buildMaterialWidget(BuildContext context);
-//
-//   @override
-//   Widget build(BuildContext context) => (Platform.isIOS)
-//       ? buildCupertinoWidget(context)
-//       : buildMaterialWidget(context);
-// }
-
 class CustomRaiseButton extends StatelessWidget {
   CustomRaiseButton({
     this.child,
@@ -110,6 +99,87 @@ class FormSubmitButton extends CustomRaiseButton {
           borderRadius: 4.0,
           onPressed: onPressed,
         );
+}
+
+abstract class PlatformWidget extends StatelessWidget {
+  Widget buildCupertinoWidget(BuildContext context);
+
+  Widget buildMaterialWidget(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) =>
+      (Platform.isIOS) ? buildCupertinoWidget(context) : buildMaterialWidget(context);
+}
+
+class PlatformAlertDialog extends PlatformWidget {
+  PlatformAlertDialog({
+    @required this.title,
+    @required this.content,
+    @required this.defaultActionText,
+  })  : assert(title != null),
+        assert(content != null),
+        assert(defaultActionText != null);
+
+  final String title;
+  final String content;
+  final String defaultActionText;
+
+  Future<bool> show(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (content) => this,
+    );
+  }
+
+  List<Widget> _buildAction(BuildContext context) {
+    return [
+      PlatformAlertDialogAction(
+        child: Text(defaultActionText),
+        onPressed: () => Navigator.of(context).pop(),
+      )
+    ];
+  }
+
+  @override
+  Widget buildCupertinoWidget(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: _buildAction(context),
+    );
+  }
+
+  @override
+  Widget buildMaterialWidget(BuildContext context) {
+    return AlertDialog(
+      title: Text(title),
+      content: Text(content),
+      actions: _buildAction(context),
+    );
+  }
+}
+
+class PlatformAlertDialogAction extends PlatformWidget {
+  PlatformAlertDialogAction({this.child, this.onPressed});
+
+  final Widget child;
+  final VoidCallback onPressed;
+
+  @override
+  Widget buildCupertinoWidget(BuildContext context) {
+    return CupertinoDialogAction(
+      child: child,
+      onPressed: onPressed,
+    );
+  }
+
+  @override
+  Widget buildMaterialWidget(BuildContext context) {
+    return FlatButton(
+      child: child,
+      onPressed: onPressed,
+    );
+  }
 }
 
 // class PlatformAlertDialogAction extends PlatformWidget {
