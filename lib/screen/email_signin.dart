@@ -1,15 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:time_tracker/auth.dart';
+import 'package:time_tracker/auth_provider.dart';
 import 'package:time_tracker/validator.dart';
 import 'package:time_tracker/windget.dart';
 
 class EmailSignInScreen extends StatelessWidget {
-  const EmailSignInScreen({Key key, @required this.auth}) : super(key: key);
-  final AuthBase auth;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +16,7 @@ class EmailSignInScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Card(
-            child: EmailSignInForm(auth: auth),
+            child: EmailSignInForm(),
           ),
         ),
       ),
@@ -33,10 +28,6 @@ class EmailSignInScreen extends StatelessWidget {
 enum EmailSignInFormType { signIn, register }
 
 class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidator {
-  EmailSignInForm({@required this.auth});
-
-  final AuthBase auth;
-
   @override
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
@@ -60,10 +51,11 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       _isLoading = true;
     });
     try {
+      final auth = AuthProvider.of(context);
       if (_formType == EmailSignInFormType.signIn) {
-        await widget.auth.signInWithEmail(_email, _password);
+        await auth.signInWithEmail(_email, _password);
       } else {
-        await widget.auth.createUserWithEmail(_email, _password);
+        await auth.createUserWithEmail(_email, _password);
       }
       Navigator.of(context).pop();
     } catch (e) {

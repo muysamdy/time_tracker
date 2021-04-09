@@ -58,8 +58,7 @@ class Auth implements AuthBase {
     // check the account not null
     if (googleAccount != null) {
       // find the way to access token.
-      GoogleSignInAuthentication googleAuth =
-          await googleAccount.authentication;
+      GoogleSignInAuthentication googleAuth = await googleAccount.authentication;
       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
         final authResult = await _firebaseAuth.signInWithCredential(
           GoogleAuthProvider.credential(
@@ -135,73 +134,3 @@ class Auth implements AuthBase {
     await googleSignIn.signOut();
   }
 }
-
-// class Auth implements AuthBase {
-//
-
-//   @override
-//   Future<User> signInWithEmail(String email, String password) async {
-//     final authResult = await _firebaseAuth.signInWithEmailAndPassword(
-//         email: email, password: password);
-//     return authResult.user;
-//   }
-//
-//   @override
-//   Future<User> createUserWithEmail(String email, String password) async {
-//     final authResult = await _firebaseAuth.createUserWithEmailAndPassword(
-//         email: email, password: password);
-//     return authResult.user;
-//   }
-//
-//   @override
-//   Future<User> signInWithGoogle() async {
-//     final googleSignIn = GoogleSignIn();
-//     final googleAccount = await googleSignIn.signIn();
-//
-//     if (googleAccount != null) {
-//       final googleAuth = await googleAccount.authentication;
-//       if (googleAuth.accessToken != null && googleAuth.idToken != null) {
-//         final authResult = await _firebaseAuth.signInWithCredential(
-//           GoogleAuthProvider.credential(
-//             idToken: googleAuth.idToken,
-//             accessToken: googleAuth.accessToken,
-//           ),
-//         );
-//         return authResult.user;
-//
-//         // return user;
-//       } else {
-//         throw PlatformException(
-//           code: 'ERROR_MISSING_GOOGLE_AUTH_TOKEN',
-//           message: 'Missing Google Auth Token',
-//         );
-//       }
-//     } else {
-//       throw PlatformException(
-//         code: 'ERROR_ABORTED_BY_USER',
-//         message: 'Sign in aborted by user',
-//       );
-//     }
-//   }
-//
-//   @override
-//   Future<User> signInWithFacebook() async {
-//     final facebookLogin = FacebookLogin();
-//     final result = await facebookLogin.logInWithReadPermissions(
-//       ['public_profile'],
-//     );
-//
-//     if (result.accessToken != null) {
-//       final authResult = await _firebaseAuth.signInWithCredential(
-//         FacebookAuthProvider.credential(result.accessToken.token),
-//       );
-//       return authResult.user;
-//     } else {
-//       throw PlatformException(
-//         code: 'ERROR_ABORTED_BY_USER',
-//         message: 'Sign in aborted by user',
-//       );
-//     }
-//   }
-//
-// }

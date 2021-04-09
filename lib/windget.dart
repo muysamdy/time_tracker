@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class CustomRaiseButton extends StatelessWidget {
   CustomRaiseButton({
@@ -115,6 +114,7 @@ class PlatformAlertDialog extends PlatformWidget {
   PlatformAlertDialog({
     @required this.title,
     @required this.content,
+    this.cancelActionText,
     @required this.defaultActionText,
   })  : assert(title != null),
         assert(content != null),
@@ -122,22 +122,37 @@ class PlatformAlertDialog extends PlatformWidget {
 
   final String title;
   final String content;
+  final String cancelActionText;
   final String defaultActionText;
 
-  Future<bool> show(BuildContext context) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (content) => this,
-    );
-  }
+  Future<bool> show(BuildContext context) async => (Platform.isIOS)
+      ? await showCupertinoDialog<bool>(
+          context: context,
+          builder: (context) => this,
+        )
+      : await showDialog<bool>(
+          context: context,
+          barrierDismissible: true,
+          builder: (content) => this,
+        );
 
   List<Widget> _buildAction(BuildContext context) {
-    return [
+    final actions = <Widget>[];
+    if (cancelActionText != null) {
+      actions.add(
+        PlatformAlertDialogAction(
+          child: Text(cancelActionText),
+          onPressed: () => Navigator.of(context).pop(false),
+        ),
+      );
+    }
+    actions.add(
       PlatformAlertDialogAction(
         child: Text(defaultActionText),
-        onPressed: () => Navigator.of(context).pop(),
-      )
-    ];
+        onPressed: () => Navigator.of(context).pop(true),
+      ),
+    );
+    return actions;
   }
 
   @override
@@ -181,97 +196,3 @@ class PlatformAlertDialogAction extends PlatformWidget {
     );
   }
 }
-
-// class PlatformAlertDialogAction extends PlatformWidget {
-//   PlatformAlertDialogAction({this.child, this.onPressed});
-//
-//   final Widget child;
-//   final VoidCallback onPressed;
-//
-//   @override
-//   Widget buildCupertinoWidget(BuildContext context) =>
-//       CupertinoDialogAction(child: child, onPressed: onPressed);
-//
-//   Widget buildMaterialWidget(BuildContext context) =>
-//       FlatButton(child: child, onPressed: onPressed);
-// }
-//
-// class PlatformAlertDialog extends PlatformWidget {
-//   PlatformAlertDialog({
-//     @required this.title,
-//     @required this.content,
-//     @required this.defaultActionText,
-//     this.cancelActionText,
-//   })  : assert(title != null),
-//         assert(content != null),
-//         assert(defaultActionText != null);
-//
-//   final String title;
-//   final String content;
-//   final String cancelActionText;
-//   final String defaultActionText;
-//
-//   Future<bool> show(BuildContext context) async => (Platform.isIOS)
-//       ? await showCupertinoDialog<bool>(
-//           context: context,
-//           builder: (context) => this,
-//         )
-//       : await showDialog<bool>(
-//           context: context,
-//           barrierDismissible: true,
-//           builder: (context) => this,
-//         );
-//
-//   List<Widget> _buildActions(BuildContext context) {
-//     final actions = <Widget>[];
-//
-//     if (cancelActionText != null) {
-//       actions
-//         ..add(
-//           PlatformAlertDialogAction(
-//             child: Text(cancelActionText),
-//             onPressed: () => Navigator.of(context).pop(false),
-//           ),
-//         );
-//     }
-//     actions
-//       ..add(
-//         PlatformAlertDialogAction(
-//           child: Text(defaultActionText),
-//           onPressed: () => Navigator.of(context).pop(true),
-//         ),
-//       );
-//   }
-//
-//   @override
-//   Widget buildCupertinoWidget(BuildContext context) => CupertinoAlertDialog(
-//         title: Text(title),
-//         content: Text(content),
-//         actions: _buildActions(context),
-//       );
-//
-//   @override
-//   Widget buildMaterialWidget(BuildContext context) => AlertDialog(
-//         title: Text(title),
-//         content: Text(content),
-//         actions: _buildActions(context),
-//       );
-// }
-//
-// class PlatformExceptionAlertDialog extends PlatformAlertDialog {
-//   PlatformExceptionAlertDialog({
-//     @required String title,
-//     @required PlatformException exception,
-//   }) : super(
-//           title: title,
-//           content: _message(exception),
-//           defaultActionText: 'OK',
-//         );
-//
-//   static const Map<String, String> _errors = {
-//     'ERROR_WRONG_PASSWORD': 'The pasword is invalid',
-//   };
-//
-//   static String _message(PlatformException exception) =>
-//       _errors[exception.code] ?? exception.message;
-// }
