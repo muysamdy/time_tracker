@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
-import 'package:time_tracker/auth_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:time_tracker/auth.dart';
+import 'package:time_tracker/platform_exception.dart';
 import 'package:time_tracker/validator.dart';
-import 'package:time_tracker/windget.dart';
+import 'package:time_tracker/widget.dart';
 
 class EmailSignInScreen extends StatelessWidget {
   @override
@@ -51,18 +54,17 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
       _isLoading = true;
     });
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context);
       if (_formType == EmailSignInFormType.signIn) {
         await auth.signInWithEmail(_email, _password);
       } else {
         await auth.createUserWithEmail(_email, _password);
       }
       Navigator.of(context).pop();
-    } catch (e) {
-      PlatformAlertDialog(
+    } on PlatformException catch (e) {
+      PlatformExceptionAlertDialog(
         title: 'Sign in failed',
-        content: e.toString(),
-        defaultActionText: 'OK',
+        exception: e,
       ).show(context);
     } finally {
       setState(() {
@@ -164,5 +166,14 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         children: _buildChildren(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
   }
 }

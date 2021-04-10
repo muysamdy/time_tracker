@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:time_tracker/auth_provider.dart';
-import 'package:time_tracker/windget.dart';
+import 'package:provider/provider.dart';
+import 'package:time_tracker/auth.dart';
+import 'package:time_tracker/widget.dart';
 
 class HomeScreen extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     try {
-      final auth = AuthProvider.of(context);
+      final auth = Provider.of<AuthBase>(context);
       await auth.signOut();
     } catch (e) {
       print(e.toString());

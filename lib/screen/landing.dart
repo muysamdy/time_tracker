@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:time_tracker/auth.dart';
-import 'package:time_tracker/auth_provider.dart';
 import 'package:time_tracker/screen/home.dart';
 import 'package:time_tracker/screen/signin.dart';
 
 class LandingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final auth = AuthProvider.of(context);
+    final auth = Provider.of<AuthBase>(context);
     return StreamBuilder<BaseUser>(
       stream: auth.onAuthStateChange,
       // snapshot is an object that hold data from stream
