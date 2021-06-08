@@ -2,12 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
-import 'package:time_tracker/auth.dart';
+import 'package:time_tracker/bloc/signin_bloc.dart';
+import 'package:time_tracker/service/auth.dart';
 import 'package:time_tracker/platform_exception.dart';
 import 'package:time_tracker/screen/email_signin.dart';
 import 'package:time_tracker/widget.dart';
 
 class SignInScreen extends StatelessWidget {
+  const SignInScreen({Key key, @required this.bloc}) : super(key: key);
+  final SignInBloc bloc;
+
+  static Widget create(BuildContext context) {
+    final auth = Provider.of<AuthBase>(context);
+    return Provider<SignInBloc>(
+      create: (_) => SignInBloc(auth: auth),
+      dispose: (context, bloc) => bloc.dispose(),
+      child: Consumer<SignInBloc>(
+        builder: (context, bloc, _) => SignInScreen(bloc: bloc),
+      ),
+    );
+  }
+
   void _showSignInError(BuildContext context, PlatformException exception) {
     PlatformExceptionAlertDialog(
       title: 'Sign in failed',
@@ -17,8 +32,9 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> _signInAnonymously(BuildContext context) async {
     try {
-      final auth = Provider.of<AuthBase>(context);
-      await auth.signInAnonymously();
+      // final auth = Provider.of<AuthBase>(context);
+      // await auth.signInAnonymously();
+      await bloc.signInAnonymously();
     } on PlatformException catch (e) {
       _showSignInError(context, e);
     }
@@ -26,8 +42,9 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> _signInWithGoogle(BuildContext context) async {
     try {
-      final auth = Provider.of(context);
-      await auth.signInWithGoogle();
+      // final auth = Provider.of(context);
+      // await auth.signInWithGoogle();
+      await bloc.signInWithGoogle();
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);
@@ -37,8 +54,9 @@ class SignInScreen extends StatelessWidget {
 
   Future<void> _signInWithFacebook(BuildContext context) async {
     try {
-      final auth = Provider.of<AuthBase>(context);
-      await auth.signInWithFacebook();
+      // final auth = Provider.of<AuthBase>(context);
+      // await auth.signInWithFacebook();
+      await bloc.signInWithFacebook();
     } on PlatformException catch (e) {
       if (e.code != 'ERROR_ABORTED_BY_USER') {
         _showSignInError(context, e);
@@ -47,10 +65,12 @@ class SignInScreen extends StatelessWidget {
   }
 
   void _signInWithEmail(BuildContext context) async {
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      fullscreenDialog: true,
-      builder: (context) => EmailSignInScreen(),
-    ));
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (context) => EmailSignInScreen(),
+      ),
+    );
   }
 
   Widget _buildHeader() {
@@ -64,7 +84,7 @@ class SignInScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool isLoading) {
     return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -122,7 +142,12 @@ class SignInScreen extends StatelessWidget {
         title: Text('Time Tracker'),
         elevation: 2.0,
       ),
-      body: _buildContent(context),
+      body: StreamBuilder<bool>(
+          stream: bloc.isLoadingStream,
+          initialData: false,
+          builder: (context, snapshot) {
+            return _buildContent(context, snapshot.data);
+          }),
       backgroundColor: Colors.grey[200],
     );
   }

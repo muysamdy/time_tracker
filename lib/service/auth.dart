@@ -52,11 +52,8 @@ class Auth implements AuthBase {
   @override
   Future<BaseUser> signInWithGoogle() async {
     // TODO: implement signInWithGoogle
-    // GoogleSignIn googleSignIn = GoogleSignIn();
     final googleSignIn = GoogleSignIn();
-    // GoogleSignInAccount googleAccount = await googleSignIn.signIn();
     final googleAccount = await googleSignIn.signIn();
-    // check the account not null
     if (googleAccount != null) {
       // find the way to access token.
       GoogleSignInAuthentication googleAuth = await googleAccount.authentication;
@@ -135,19 +132,3 @@ class Auth implements AuthBase {
     await googleSignIn.signOut();
   }
 }
-
-// class AuthProvider extends InheritedWidget {
-//   AuthProvider({@required this.auth, @required this.child});
-//
-//   final AuthBase auth;
-//   final Widget child;
-//
-//   @override
-//   bool updateShouldNotify(covariant InheritedWidget oldWidget) => false;
-//
-//   static AuthBase of(BuildContext context) {
-//     AuthProvider provider = context.dependOnInheritedWidgetOfExactType<AuthProvider>();
-//     return provider.auth;
-//   }
-// }
-//
